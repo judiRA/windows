@@ -1,0 +1,24 @@
+name: Build Windows download
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build tools
+        run: python -m pip install pygame pyinstaller
+      - name: Build executable
+        run: pyinstaller --noconfirm --clean --windowed --name TheUnsentWitness night_signal.py
+      - name: Package itch download
+        shell: pwsh
+        run: Compress-Archive -Path 'dist/TheUnsentWitness/*' -DestinationPath 'TheUnsentWitness-Windows.zip'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TheUnsentWitness-Windows
+          path: TheUnsentWitness-Windows.zip
